@@ -10,22 +10,26 @@ LiquidCrystal_I2C lcd (0x00,16,2);
 const byte address1[6] = "00001";
 const byte address2[6] = "00011";
 
-const int genSwitch = A5;
-const int checkLed = 4;
+const int genSwitch = A4;
+const int checkLed = 10;
 const int led = 2; //Associazione ai pin arduino
 const int rele2 = 3;
-const int rele3 = A0;
-const int rele4 = A1;
-const int rele5 = 6;
+const int rele3 = 4;
+const int rele4 = 5;
+const int rele5 = 6 ;
 
 void setup() {
+  digitalWrite(9,HIGH);
+  pinMode(9,OUTPUT);
+  
+  delay(3000);
   boolean confirm = false;
   int countWhile = 0;
   pinMode(checkLed, OUTPUT);
   pinMode(led, INPUT);//PinMode
   pinMode(rele2, INPUT);
   pinMode(rele3, INPUT);
-  pinMode(rele4, INPUT);
+  pinMode(rele4, INPUT_PULLUP);
   pinMode(rele5, INPUT);
   pinMode(genSwitch,INPUT);
   Serial.begin(9600);
@@ -75,11 +79,11 @@ while(!confirm){
 }
 
 void loop() {
-
- if(digitalRead(genSwitch)==HIGH){ //DA SISTEMARE
+ //if(digitalRead(genSwitch)==HIGH){ //DA SISTEMARE
   if(digitalRead(led)==HIGH){
    radio.write("trigger1", sizeof("trigger1"));
    delay(200);
+   digitalWrite(9,LOW);
    Serial.println("Inviato 1");
    lcd.clear();
    lcd.setCursor(4,0);
@@ -143,5 +147,5 @@ void loop() {
    lcd.print("INNESCATA.");
    delay(3000);
   }
- }
+ //}
 }
