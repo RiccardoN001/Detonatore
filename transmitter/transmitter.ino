@@ -5,33 +5,59 @@
 
 RF24 radio(7,8);
 
-LiquidCrystal_I2C lcd (0x00,16,2);
+LiquidCrystal_I2C lcd (0x27,16,2);
 
 const byte address1[6] = "00001";
 const byte address2[6] = "00011";
 
-const int genSwitch = A4;
-const int checkLed = 10;
-const int led = 2; //Associazione ai pin arduino
+const int genSwitch = 10;
+const int checkLed = 9;
+const int rele1 = 2; //Associazione ai pin arduino
 const int rele2 = 3;
 const int rele3 = 4;
 const int rele4 = 5;
 const int rele5 = 6 ;
+const int rstt = A3;
+const int rstr = A2;
+
+void attesaMiccia(){
+  lcd.setCursor(1,0);
+  lcd.print("RECEIVER IN");
+  lcd.setCursor(1,1);
+  lcd.print("ASCOLTO..");
+}
+void nonArmati(){
+  lcd.clear();
+  lcd.setCursor(2,0);
+  lcd.print("INTERRUTTORI");
+  lcd.setCursor(3,1);
+  lcd.print("NON ARMATI");
+  delay(2000);
+  lcd.clear();
+}
 
 void setup() {
-  digitalWrite(9,HIGH);
-  pinMode(9,OUTPUT);
-  
+  lcd.begin();
+  lcd.setCursor(1,0);
+  lcd.print("--BENVENUTO!--");
+  lcd.setCursor(5,1);
+  lcd.print("by R&T");
   delay(3000);
+  lcd.clear();
+  
+  digitalWrite(rstt,HIGH);
+  pinMode(rstt,OUTPUT);
   boolean confirm = false;
   int countWhile = 0;
   pinMode(checkLed, OUTPUT);
-  pinMode(led, INPUT);//PinMode
+  pinMode(rele1, INPUT);//PinMode
   pinMode(rele2, INPUT);
   pinMode(rele3, INPUT);
-  pinMode(rele4, INPUT_PULLUP);
+  pinMode(rele4, INPUT);
   pinMode(rele5, INPUT);
-  pinMode(genSwitch,INPUT);
+  pinMode(genSwitch,INPUT_PULLUP);
+  pinMode(rstr, INPUT_PULLUP);
+  
   Serial.begin(9600);
   
   radio.begin();
@@ -67,23 +93,22 @@ while(!confirm){
     }
  }
  radio.stopListening();
-  
-  
-  lcd.begin();
-  lcd.setCursor(1,0);
-  lcd.print("--BENVENUTO!--");
-  lcd.setCursor(6,1);
-  lcd.print("by R&T");
-  delay(2000);
-  lcd.clear();
+
+ lcd.setCursor(2,0);
+ lcd.print("COLLEGAMENTO");
+ lcd.setCursor(3,1);
+ lcd.print("EFFETTUATO");
+ delay(2000);
+ lcd.clear();
 }
 
 void loop() {
- //if(digitalRead(genSwitch)==HIGH){ //DA SISTEMARE
-  if(digitalRead(led)==HIGH){
+
+ if(digitalRead(genSwitch)==LOW){
+  attesaMiccia();
+  if(digitalRead(rele1)==HIGH){
    radio.write("trigger1", sizeof("trigger1"));
    delay(200);
-   digitalWrite(9,LOW);
    Serial.println("Inviato 1");
    lcd.clear();
    lcd.setCursor(4,0);
@@ -91,6 +116,7 @@ void loop() {
    lcd.setCursor(3,1);
    lcd.print("INNESCATA.");
    delay(3000);
+   lcd.clear();
   }
   if(digitalRead(rele2)==HIGH){
    radio.write("trigger2", sizeof("trigger2"));
@@ -102,6 +128,7 @@ void loop() {
    lcd.setCursor(3,1);
    lcd.print("INNESCATA.");
    delay(3000);
+   lcd.clear();
   }
   if(digitalRead(rele3)==HIGH){
    radio.write("trigger3", sizeof("trigger3"));
@@ -113,6 +140,7 @@ void loop() {
    lcd.setCursor(3,1);
    lcd.print("INNESCATA.");
    delay(3000);
+   lcd.clear();
   }
   if(digitalRead(rele4)==HIGH){
    radio.write("trigger4", sizeof("trigger4"));
@@ -124,6 +152,7 @@ void loop() {
    lcd.setCursor(3,1);
    lcd.print("INNESCATA.");
    delay(3000);
+   lcd.clear();
   }
   if(digitalRead(rele5)==HIGH){
    radio.write("trigger5", sizeof("trigger5"));
@@ -135,17 +164,21 @@ void loop() {
    lcd.setCursor(3,1);
    lcd.print("INNESCATA.");
    delay(3000);
+   lcd.clear();
   }
-  if(digitalRead(led)==HIGH && digitalRead(rele2)==HIGH){
+  if(digitalRead(rstr)==LOW){
    radio.write("reset", sizeof("reset"));
    delay(200);
    Serial.println("Inviato reset");
    lcd.clear();
    lcd.setCursor(4,0);
-   lcd.print("MICCIA 5");
+   lcd.print("RESET");
    lcd.setCursor(3,1);
-   lcd.print("INNESCATA.");
+   lcd.print("RECEVIER.");
    delay(3000);
+   lcd.clear();
   }
- //}
+ }else{
+  nonArmati();
+ }
 }

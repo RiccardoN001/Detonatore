@@ -68,7 +68,7 @@ void loop() {
       radio.read(&text, sizeof(text));
     String transData = String(text);
     if (transData == "trigger1" && count1 <3) {
-        digitalWrite(9,LOW);
+        
         digitalWrite(rele1, HIGH);
         Serial.print("Arrivato 1, ");
         Serial.println(count1);
